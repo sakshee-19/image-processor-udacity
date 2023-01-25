@@ -13,6 +13,22 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util.js';
   // Use the body parser middleware for post requests
   app.use(bodyParser.json());
 
+    app.get( "/filteredimage", async (req, res) => {
+      const image_url = req.query.image_url;
+      if(!image_url){
+        res.status(400).send("Image Url required");
+      }
+      try {
+        const response = await filterImageFromURL(image_url);
+        res.status(200).sendFile(response, async () => {
+          await deleteLocalFiles(response);
+        });
+      } catch (e) {
+        console.log(e);
+        res.status(500).send("Internal Server error");
+      }
+    });
+
   
   // Root Endpoint
   // Displays a simple message to the user
